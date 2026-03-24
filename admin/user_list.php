@@ -25,7 +25,7 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
           <div class="col-md-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">Bordered Listing</h3>
+                <h3 class="card-title">User Listing</h3>
               </div>
 
               <?php
@@ -40,23 +40,23 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
               $offset = ($pageno - 1) * $numOfrecs; //for pages
 
               if(empty($_POST['search'])){
-                $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
+                $stmt = $pdo->prepare("SELECT * FROM users ORDER BY id DESC");
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC LIMIT $offset,$numOfrecs");
+                $stmt = $pdo->prepare("SELECT * FROM users ORDER BY id DESC LIMIT $offset,$numOfrecs");
                 $stmt->execute();
                 $result = $stmt->fetchAll();
               }else{
                 $searchKey = $_POST['search'];
-                $stmt = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchKey%' ORDER BY id DESC");
+                $stmt = $pdo->prepare("SELECT * FROM users WHERE title LIKE '%$searchKey%' ORDER BY id DESC");
                 // print_r($stmt);exit();
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC LIMIT $offset,$numOfrecs");
+                $stmt = $pdo->prepare("SELECT * FROM users ORDER BY id DESC LIMIT $offset,$numOfrecs");
                 $stmt->execute();
                 $result = $stmt->fetchAll();
               }
@@ -66,15 +66,16 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
               <div class="card-body">
 
                 <div>
-                  <a href="add.php" type="button" class="btn btn-success">New Blog Post</a>
+                  <a href="user_add.php" type="button" class="btn btn-success">Create User</a>
                 </div><br>
 
                 <table class="table table-bordered">
                   <thead>                  
                     <tr>
                       <th style="width: 10px">#</th>
-                      <th>Title</th>
-                      <th>Content</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
                       <th style="width: 40px">Actions</th>
                     </tr>
                   </thead>
@@ -89,12 +90,13 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
 
                     <tr>
                       <td><?php echo $i; ?></td>
-                      <td><?php echo $value['title']; ?></td>
-                      <td><?php echo substr($value['content'],0,50); ?></td>
+                      <td><?php echo $value['name']; ?></td>
+                      <td><?php echo $value['email']; ?></td>
+                      <td><?php echo $value['role']; ?></td>
                       <td>
                         <div class="btn-group">
                           <div>
-                            <a href="edit.php?id=<?php echo $value['id'] ?>" type="button" class="btn btn-warning">Edit</a>
+                            <a href="user_edit.php?id=<?php echo $value['id'] ?>" type="button" class="btn btn-warning">Edit</a>
                           </div>
                           <div>
                             <a href="delete.php?id=<?php echo $value['id'] ?>"
