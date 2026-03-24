@@ -18,10 +18,17 @@ $stmtcmt = $pdo->prepare("SELECT * FROM comments WHERE post_id=$blogId");
 $stmtcmt->execute();
 $cmResult = $stmtcmt->fetchAll();
 
-$authorId = $cmResult[0]['author_id'];
-$stmtau = $pdo->prepare("SELECT * FROM users WHERE id=$authorId");
-$stmtau->execute();
-$auResult = $stmtau->fetchAll();
+
+$auResult = [];
+if($cmResult){
+  foreach ($cmResult as $key => $value){
+    $authorId = $cmResult[$key]['author_id'];
+    $stmtau = $pdo->prepare("SELECT * FROM users WHERE id=$authorId");
+    $stmtau->execute();
+    $auResult = $stmtau->fetchAll();
+  }
+}
+// print_r($auResult); //
 
 
 $blogId = $_GET['id'];
@@ -51,7 +58,7 @@ if ($_POST) {
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>AdminLTE 3 | Widgets</title>
+  <title>Blog Details</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Font Awesome -->
@@ -107,15 +114,31 @@ if ($_POST) {
                 <div class="card-comment">
                   <!-- User image -->
                   
-                  <div class="comment-text" style="margin-left: 0px !important;">
-                    <span class="username">
-                      <?php echo $auResult[0]['name']; ?>
-                      <span class="text-muted float-right"><?php echo $cmResult[0]['created_at'];?></span>
-                    </span><!-- /.username -->
-                    <?php echo $cmResult[0]['content']; ?>
-                  </div>
-                  <!-- /.comment-text -->
-                </div>
+                  <?php
+                  
+                  if($cmResult){   ?>
+                    <div class="comment-text" style="margin-left: 0px !important;">
+                    <?php foreach ($cmResult as $key => $value){  ?>
+
+                      <span class="username">
+                      <?php echo $auResult[$key]['name']; ?>
+                      <span class="text-muted float-right"><?php echo $value['created_at'];?></span>
+                      </span><!-- /.username -->
+                      <?php echo $value['content']; ?>
+                      </div>
+                      <!-- /.comment-text -->
+                    </div>
+
+                    <?php
+                    }
+                    
+                    
+                    ?>
+                  <?php
+                  }
+                  
+                  
+                  ?>
                 <!-- /.card-comment -->
                 
                 <!-- /.card-comment -->
