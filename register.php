@@ -8,7 +8,7 @@ require 'config/common.php';
 if ($_POST) {
 
     
-    if(empty($_POST['name']) || empty($_POST['email']) || empty($_FILES['password']) || strlen($_POST['password'] < 4)){
+    if(empty($_POST['name']) || empty($_POST['email']) || empty($_POST['password']) || strlen($_POST['password']) < 4){
 
       if(empty($_POST['name'])){
         $nameError = "name cannot be null";
@@ -30,7 +30,7 @@ if ($_POST) {
 
       $stmt = $pdo->prepare("SELECT * FROM users WHERE email=:email");
 
-      $stmt->bindValue('email',$email);
+      $stmt->bindValue(':email',$email);
       $stmt->execute();
 
       $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -38,9 +38,9 @@ if ($_POST) {
       if($user){
           echo "<script>alert('Email duplicated')</script>";
       }else{
-          $stmt = $pdo->prepare("INSERT INTO users(name,email,password,role) VALUES (:name,:email,:password,:role)");
+          $stmt = $pdo->prepare("INSERT INTO users(name,email,password) VALUES (:name,:email,:password)");
           $result = $stmt->execute(
-              array(':name'=>$name,':email'=>$email,':password'=>$password,':role'=>$role)
+              array(':name'=>$name,':email'=>$email,':password'=>$password)
           );
 
           if($result){
@@ -110,7 +110,7 @@ if ($_POST) {
         
         <p style="color: red;"><?php echo empty($passwordError) ? '' : '*'.$passwordError; ?></p>
         <div class="input-group mb-3">
-          <input type="password" name="password" class="form-control" placeholder="Password" required>
+          <input type="password" name="password" class="form-control" placeholder="Password" >
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>

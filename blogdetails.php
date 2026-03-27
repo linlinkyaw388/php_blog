@@ -24,13 +24,17 @@ $cmResult = $stmtcmt->fetchAll();
 $auResult = [];
 if($cmResult){
   foreach ($cmResult as $key => $value){
-    $authorId = $cmResult[$key]['author_id'];
+    $authorId = $cmResult[$key]['author_id'];// $value['author_id'];
     $stmtau = $pdo->prepare("SELECT * FROM users WHERE id=$authorId");
     $stmtau->execute();
     $auResult = $stmtau->fetchAll();
+    // fetchAll() အစား fetch() ကိုသုံးပြီး array ထဲကို $key နဲ့ သိမ်းလိုက်ပါ
+    // $user = $stmtau->fetch(PDO::FETCH_ASSOC);
+    // $auResult[$key] = $user;
+    // $auResult = $stmtau->fetchAll();
   }
 }
-// print_r($auResult); //
+print_r($auResult); //
 
 
 $blogId = $_GET['id'];
@@ -60,8 +64,49 @@ if ($_POST) {
     
     }
 
+// ... session and config require ...
 
+// $blogId = $_GET['id'];
+
+// // ၁။ Blog Post အသေးစိတ်ကို ဆွဲထုတ်ခြင်း
+// $stmt = $pdo->prepare("SELECT * FROM posts WHERE id = :id");
+// $stmt->execute([':id' => $blogId]);
+// $result = $stmt->fetch(PDO::FETCH_ASSOC); // fetchAll အစား fetch ပဲသုံးပါ (Post က တစ်ခုပဲမို့လို့)
+
+// // ၂။ Comments နဲ့ Authors ကို JOIN သုံးပြီး တစ်ခါတည်း ဆွဲထုတ်ခြင်း
+// $stmtcmt = $pdo->prepare("
+//     SELECT comments.*, users.name as author_name 
+//     FROM comments 
+//     JOIN users ON comments.author_id = users.id 
+//     WHERE comments.post_id = :post_id
+//     ORDER BY comments.id DESC
+// ");
+// $stmtcmt->execute([':post_id' => $blogId]);
+// $cmResult = $stmtcmt->fetchAll();
+
+// // ၃။ Comment တင်တဲ့ Logic
+// if ($_POST) {
+//     if(empty($_POST['comment'])){
+//         $cmtError = "comment cannot be null";
+//     } else {
+//         $comment = $_POST['comment'];
+//         $stmt = $pdo->prepare("INSERT INTO comments(content,author_id,post_id) VALUES (:content,:author_id,:post_id)");
+//         $res = $stmt->execute([
+//             ':content' => $comment,
+//             ':author_id' => $_SESSION['user_id'],
+//             ':post_id' => $blogId
+//         ]);
+
+//         if($res){
+//             header('Location: blogdetails.php?id='.$blogId);
+//             exit();
+//         }
+//     }
+// }
 ?>
+
+
+
 
 
 <!DOCTYPE html>
@@ -103,7 +148,7 @@ if ($_POST) {
             <div class="card card-widget">
               <div class="card-header">
                 <div style="text-align: center !important;float:none" class="card-title">
-                    <h4><?php echo $result[0]['title'];?></h4>
+                    <h4><?php echo escape($result[0]['title']);?></h4>
                 </div>
                 <!-- /.user-block -->
                 
@@ -116,7 +161,7 @@ if ($_POST) {
 
                 <br><br>
 
-                <p><?php echo $result[0]['content']?></p>
+                <p><?php echo escape($result[0]['content'])?></p>
                 <h3>Comments</h3><hr>
                 <a href="/blog" type="button" class="btn btn-default">Go Back</a>
               </div>
@@ -132,10 +177,10 @@ if ($_POST) {
                     <?php foreach ($cmResult as $key => $value){  ?>
 
                       <span class="username">
-                      <?php echo $auResult[$key]['name']; ?>
-                      <span class="text-muted float-right"><?php echo $value['created_at'];?></span>
+                      <?php echo escape($auResult[$key][0]['name']); ?>
+                      <span class="text-muted float-right"><?php echo escape($value['created_at']);?></span>
                       </span><!-- /.username -->
-                      <?php echo $value['content']; ?>
+                      <?php echo escape($value['content']); ?>
                       </div>
                       <!-- /.comment-text -->
                     </div>

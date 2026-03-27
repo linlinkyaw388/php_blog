@@ -1,6 +1,7 @@
 <?php
 
 require '../config/config.php';
+require '../config/common.php';
 
 session_start();
 
@@ -104,8 +105,8 @@ if(isset($_POST['search'])){
 
                     <tr>
                       <td><?php echo $i; ?></td>
-                      <td><?php echo $value['name']; ?></td>
-                      <td><?php echo $value['email']; ?></td>
+                      <td><?php echo escape($value['name']); ?></td>
+                      <td><?php echo escape($value['email']); ?></td>
                       <td><?php echo $value['role']; ?></td>
                       <td>
                         <div class="btn-group">

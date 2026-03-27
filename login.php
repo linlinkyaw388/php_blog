@@ -11,7 +11,7 @@ if ($_POST) {
 
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email=:email");
 
-    $stmt->bindValue('email',$email);
+    $stmt->bindValue(':email',$email);
     $stmt->execute();
 
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
