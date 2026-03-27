@@ -10,17 +10,19 @@ if ($_POST) {
 
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email=:email");
 
-    $stmt->bindValue('email',$email);
+    $stmt->bindValue(':email',$email);
     $stmt->execute();
 
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if($user){
+      // var_dump(password_verify($password,$user['password']));
 
-        if($user['password'] == $password){
+        if(password_verify($password,$user['password'])){
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['name'];
-            $_SESSION['logged_in'] = time();
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['logged_in'] = time();//true
             
             header('Location: index.php');
             exit();

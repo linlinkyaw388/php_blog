@@ -17,9 +17,10 @@ if ($_POST) {
 
     if($user){
 
-        if($user['password'] == $password){
+        if(password_verify($password,$user['password'])){
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['name'];
+            $_SESSION['role'] = 1;
             $_SESSION['logged_in'] = time();
             
             header('Location: index.php');
@@ -58,7 +59,7 @@ if ($_POST) {
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="login-logo">
-    <a href="../../index2.html"><b>Blog</b></a>
+    <a href="#"><b>Blog</b></a>
   </div>
   <!-- /.login-logo -->
   <div class="card">

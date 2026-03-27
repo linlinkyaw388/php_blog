@@ -1,13 +1,22 @@
 <?php
 
-require 'config/config.php';
-
 session_start();
+
+require 'config/config.php';
 
 if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
   header('Location: login.php');
   exit();
 };
+
+// if($_POST['search']){
+//   setcookie('search', $_POST['search'], time() + (86400 * 30), "/"); // 86400 = 1 day
+// }else{
+//   if(empty($_GET['pageno'])) {
+//     unset($_COOKIE['search']);
+//     setcookie('search','', -1,'/');
+//   }
+// };
 
 ?>
 

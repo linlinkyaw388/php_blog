@@ -9,6 +9,20 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
   exit();
 };
 
+if($_SESSION['role'] != 1){
+  header('Location: login.php');
+}
+
+$searchKey = "";
+if(isset($_POST['search'])){
+  setcookie('search', $_POST['search'], time() + (86400 * 30), "/"); // 86400 = 1 day
+}else{
+  if(empty($_GET['pageno'])) {
+    unset($_COOKIE['search']);
+    setcookie('search','', -1,'/');
+  }
+};
+
 ?>
 
 
@@ -39,7 +53,7 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
               $numOfrecs = 5;
               $offset = ($pageno - 1) * $numOfrecs; //for pages
 
-              if(empty($_POST['search'])){
+              if(empty($_POST['search']) && empty($_COOKIE['search'])){
                 $stmt = $pdo->prepare("SELECT * FROM users ORDER BY id DESC");
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
@@ -49,7 +63,7 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
                 $stmt->execute();
                 $result = $stmt->fetchAll();
               }else{
-                $searchKey = $_POST['search'];
+                $searchKey = $_POST['search'] ? $_POST['search'] : $_COOKIE['search'];
                 $stmt = $pdo->prepare("SELECT * FROM users WHERE title LIKE '%$searchKey%' ORDER BY id DESC");
                 // print_r($stmt);exit();
                 $stmt->execute();

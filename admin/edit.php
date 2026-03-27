@@ -9,38 +9,57 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
   exit();
 };
 
+if($_SESSION['role'] != 1){
+  header('Location: login.php');
+}
+
 if($_POST){
-    $id = $_POST['id'];
-    $title = $_POST['title'];
-    $content = $_POST['content'];
 
-    if($_FILES['image']['name'] != null){
+  if(empty($_POST['title']) || empty($_POST['content'])){
 
-         $file = 'images/'.($_FILES['image']['name']);
-        $imageType = pathinfo($file,PATHINFO_EXTENSION);
-
-        if($imageType != 'png' && $imageType != 'jpg' && $imageType != 'jpeg'){
-            echo "<script>alert('Image must be png,jpg,jpeg')</script>";
-        }else{    
-            $image = $_FILES['image']['name'];
-                                                            //path
-            move_uploaded_file($_FILES['image']['tmp_name'],$file);
-
-            $stmt = $pdo->prepare("UPDATE posts SET title='$titel',content='$content',image='$image' WHERE id='$id'");
-            $result = $stmt->execute();
-            if($result){
-                echo "<script>alert('Successfully Update');window.location.href='index.php';</script>";
-            }
-        }
-
+      if(empty($_POST['title'])){
+        $titleError = "Title cannot be null";
+      }
+      if(empty($_POST['content'])){
+        $contentError = "content cannot be null";
+      }
+      
     }else{
-        $stmt = $pdo->prepare("UPDATE posts SET title='$titel',content='$content' WHERE id='$id'");
-        $result = $stmt->execute();
-        if($result){
-            echo "<script>alert('Successfully Update');window.location.href='index.php';</script>";
-            // header('Location: index.php');
-            }
+
+      $id = $_POST['id'];
+      $title = $_POST['title'];
+      $content = $_POST['content'];
+
+      if($_FILES['image']['name'] != null){
+
+          $file = 'images/'.($_FILES['image']['name']);
+          $imageType = pathinfo($file,PATHINFO_EXTENSION);
+
+          if($imageType != 'png' && $imageType != 'jpg' && $imageType != 'jpeg'){
+              echo "<script>alert('Image must be png,jpg,jpeg')</script>";
+          }else{    
+              $image = $_FILES['image']['name'];
+                                                              //path
+              move_uploaded_file($_FILES['image']['tmp_name'],$file);
+
+              $stmt = $pdo->prepare("UPDATE posts SET title='$titel',content='$content',image='$image' WHERE id='$id'");
+              $result = $stmt->execute();
+              if($result){
+                  echo "<script>alert('Successfully Update');window.location.href='index.php';</script>";
+              }
+          }
+
+      }else{
+          $stmt = $pdo->prepare("UPDATE posts SET title='$titel',content='$content' WHERE id='$id'");
+          $result = $stmt->execute();
+          if($result){
+              echo "<script>alert('Successfully Update');window.location.href='index.php';</script>";
+              // header('Location: index.php');
+              }
+      }
+
     }
+    
 }
 
 $stmt = $pdo->prepare("SELECT * FROM posts WHERE id=".$_GET['id']);
@@ -67,19 +86,19 @@ $result = $stmt->fetchAll();
                 
                 <input type="hidden" name="id" value="<?php echo $result[0]['id'] ?>">
 
-                <label for="">Title</label>
-                <input type="text" class="form-control" name="title" value="<?php echo $result[0]['title'] ?>" required>
+                <label for="">Title</label><p style="color: red;"><?php echo empty($titleError) ? '' : '*'.$titleError; ?></p>
+                <input type="text" class="form-control" name="title" value="<?php echo $result[0]['title'] ?>">
               </div>
 
               <div class="form-group">
-                <label for="">Content</label>
+                <label for="">Content</label><p style="color: red;"><?php echo empty($contentError) ? '' : '*'.$contentError; ?></p>
                 <textarea class="form-control" name="content" id="" rows="8" cols="80"><?php echo $result[0]['content'] ?></textarea>
               </div>
 
               <div class="form-group">
                 <label for="">Image</label>
                 <img src="images/<?php echo $result[0]['image'] ?>" width="150" height="150" alt=""><br><br>
-                <input type="file"  name="image" value="" required>
+                <input type="file"  name="image" value="">
               </div>
 
               <div class="form-group">

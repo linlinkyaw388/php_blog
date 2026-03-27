@@ -5,3 +5,4 @@ $stmt = $pdo->prepare("DELETE FROM posts WHERE id=".$_GET['id']);
 $stmt->execute();
 
 header('Location: user_list.php');
+exit();
