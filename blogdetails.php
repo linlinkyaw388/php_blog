@@ -27,14 +27,14 @@ if($cmResult){
     $authorId = $cmResult[$key]['author_id'];// $value['author_id'];
     $stmtau = $pdo->prepare("SELECT * FROM users WHERE id=$authorId");
     $stmtau->execute();
-    $auResult = $stmtau->fetchAll();
+    $auResult[] = $stmtau->fetchAll();
     // fetchAll() အစား fetch() ကိုသုံးပြီး array ထဲကို $key နဲ့ သိမ်းလိုက်ပါ
     // $user = $stmtau->fetch(PDO::FETCH_ASSOC);
     // $auResult[$key] = $user;
     // $auResult = $stmtau->fetchAll();
   }
 }
-print_r($auResult); //
+// print_r($auResult); //
 
 
 $blogId = $_GET['id'];
