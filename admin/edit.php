@@ -30,6 +30,7 @@ if($_POST){
       $id = $_POST['id'];
       $title = $_POST['title'];
       $content = $_POST['content'];
+      $image = $_FILES['image'];
 
       if($_FILES['image']['name'] != null){
 
@@ -43,16 +44,29 @@ if($_POST){
                                                               //path
               move_uploaded_file($_FILES['image']['tmp_name'],$file);
 
-              $stmt = $pdo->prepare("UPDATE posts SET title='$titel',content='$content',image='$image' WHERE id='$id'");
-              $result = $stmt->execute();
+              $stmt = $pdo->prepare("UPDATE posts SET title=:title, content=:content, image=:image WHERE id=:id");
+              $result = $stmt->execute(
+                [
+                ':title' => $title,
+                ':content' => $content,
+                ':image' => $image,
+                ':id' => $id
+                ]
+              );
               if($result){
                   echo "<script>alert('Successfully Update');window.location.href='index.php';</script>";
               }
           }
 
       }else{
-          $stmt = $pdo->prepare("UPDATE posts SET title='$titel',content='$content' WHERE id='$id'");
-          $result = $stmt->execute();
+          $stmt = $pdo->prepare("UPDATE posts SET title=:title, content=:content WHERE id=:id");
+          $result = $stmt->execute(
+            [
+            ':title' => $title,
+            ':content' => $content,
+            ':id' => $id
+            ]
+          );
           if($result){
               echo "<script>alert('Successfully Update');window.location.href='index.php';</script>";
               // header('Location: index.php');
@@ -63,9 +77,11 @@ if($_POST){
     
 }
 
-$stmt = $pdo->prepare("SELECT * FROM posts WHERE id=".$_GET['id']);
+$stmt = $pdo->prepare("SELECT * FROM posts WHERE id=:id");
+$stmt->bindValue(':id',$_GET['id']);
 $stmt->execute();
-$result = $stmt->fetchAll();
+// $result = $stmt->fetch();
+$result = $stmt->fetch(PDO::FETCH_ASSOC); // fetchAll အစား fetch ပဲ သုံးလိုက်ပါ (ID က တစ်ခုပဲမို့လို့)
 
 ?>
 
@@ -86,20 +102,20 @@ $result = $stmt->fetchAll();
               <input type="hidden" name="_token" value="<?php echo $_SESSION['_token'];?>">
               <div class="form-group">
                 
-                <input type="hidden" name="id" value="<?php echo $result[0]['id'] ?>">
+                <input type="hidden" name="id" value="<?php echo $result['id'] ?>">
 
                 <label for="">Title</label><p style="color: red;"><?php echo empty($titleError) ? '' : '*'.$titleError; ?></p>
-                <input type="text" class="form-control" name="title" value="<?php echo escape($result[0]['title']) ?>">
+                <input type="text" class="form-control" name="title" value="<?php echo escape($result['title']) ?>">
               </div>
 
               <div class="form-group">
                 <label for="">Content</label><p style="color: red;"><?php echo empty($contentError) ? '' : '*'.$contentError; ?></p>
-                <textarea class="form-control" name="content" id="" rows="8" cols="80"><?php echo escape($result[0]['content']) ?></textarea>
+                <textarea class="form-control" name="content" id="" rows="8" cols="80"><?php echo escape($result['content']) ?></textarea>
               </div>
 
               <div class="form-group">
-                <label for="">Image</label>
-                <img src="images/<?php echo $result[0]['image'] ?>" width="150" height="150" alt=""><br><br>
+                <label for="">Image</label><br>
+                <img src="images/<?php echo $result['image'] ?>" width="150" height="150" alt=""><br><br>
                 <input type="file"  name="image" value="">
               </div>
 

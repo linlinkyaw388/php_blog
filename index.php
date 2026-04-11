@@ -19,6 +19,17 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
 //   }
 // };
 
+$searchKey = "";
+if(isset($_POST['search'])){
+  setcookie('search', $_POST['search'], time() + (86400 * 30), "/"); // 86400 = 1 day
+}else{
+  if(empty($_GET['pageno'])) {
+    unset($_COOKIE['search']);
+    setcookie('search','', -1,'/');
+  }
+};
+
+
 ?>
 
 
@@ -31,7 +42,7 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>AdminLTE 3 | Widgets</title>
+  <title>Blog Site</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Font Awesome -->
@@ -50,14 +61,35 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
   <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
- 
+
+
+<?php
+      
+      $link = $_SERVER['PHP_SELF'];
+      // print_r($link);
+      $link_array = explode('/',$link);
+      $page = end($link_array);//နောက်ဆုံးနေရာ
+      
+      ?>
+    <form class="form-inline ml-3" method="post" action="<?php echo $page == 'index.php' ? 'index.php':'user_list.php';?>">
+       <input type="hidden" name="_token" value="<?php echo $_SESSION['_token'];?>">
+      <div class="input-group input-group-sm">
+        <input name="search" class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+        <div class="input-group-append">
+          <button class="btn btn-navbar" type="submit">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+
 
   <!-- Content Wrapper. Contains page content -->
   <div class="">
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <div class="container-fluid">
-
+          <div>
             <h1 style="text-align: center;">Blog Site</h1>
           </div>
           
@@ -87,14 +119,15 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
                 $stmt->execute();
                 $result = $stmt->fetchAll();
               }else{
-                $searchKey = $_POST['search'];
+                // $searchKey = $_POST['search'] ? $_POST['search'] : $_COOKIE['search'];
+                $searchKey = !empty($_POST['search']) ? $_POST['search'] : (isset($_COOKIE['search']) ? $_COOKIE['search'] : '');
                 $stmt = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchKey%' ORDER BY id DESC");
                 // print_r($stmt);exit();
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC LIMIT $offset,$numOfrecs");
+                $stmt = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchKey%' ORDER BY id DESC LIMIT $offset,$numOfrecs");
                 $stmt->execute();
                 $result = $stmt->fetchAll();
               }
@@ -110,7 +143,7 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
 
           if($result){
 
-              $i = 1;
+              $i = $offset +1;
               foreach($result as $value){    ?>
 
                 <div class="col-md-4">
@@ -128,7 +161,7 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
                     <!-- /.card-header -->
                     <div class="card-body">
                       
-                     <a href="blogdetails.php?id=<?php echo $value['id'];?>"><img class="img-fluid pad" src="admin/images/<?php echo $value['image'] ?>" style="height: 200px !important;"  alt=""></a>
+                     <a href="blogdetails.php?id=<?php echo $value['id'];?>"><img class="img-fluid pad" src="admin/images/<?php echo $value['image'] ?>" style="height: 200px !important;width:300px"  alt=""></a>
 
                     </div>
                     <!-- /.card-body -->
@@ -191,6 +224,9 @@ if(empty($_SESSION['user_id']) || empty($_SESSION['logged_in'])){
   <!-- /.control-sidebar -->
 </div>
 <!-- ./wrapper -->
+
+
+
 
 <!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>

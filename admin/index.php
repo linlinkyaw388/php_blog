@@ -57,7 +57,7 @@ if(isset($_POST['search'])){
 
             
               if(empty($_POST['search']) && empty($_COOKIE['search'])){
-                $stmt = $pdo->prepare("SELECT * FROM users ORDER BY id DESC");
+                $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
@@ -66,14 +66,15 @@ if(isset($_POST['search'])){
                 $stmt->execute();
                 $result = $stmt->fetchAll();
               }else{
-                $searchKey = $_POST['search'] ? $_POST['search'] : $_COOKIE['search'];
+                // $searchKey = $_POST['search'] ? $_POST['search'] : $_COOKIE['search'];
+                $searchKey = !empty($_POST['search']) ? $_POST['search'] : (isset($_COOKIE['search']) ? $_COOKIE['search'] : '');
                 $stmt = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchKey%' ORDER BY id DESC");
                 // print_r($stmt);exit();
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC LIMIT $offset,$numOfrecs");
+                $stmt = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchKey%' ORDER BY id DESC LIMIT $offset,$numOfrecs");
                 $stmt->execute();
                 $result = $stmt->fetchAll();
               }
@@ -101,7 +102,7 @@ if(isset($_POST['search'])){
 
                   if($result){
 
-                  $i = 1;
+                  $i = $offset +1;
                   foreach($result as $value){    ?>
 
                     <tr>

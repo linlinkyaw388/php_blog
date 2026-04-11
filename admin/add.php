@@ -17,7 +17,7 @@ if($_SESSION['role'] != 1){
 
 if($_POST){        
                //name
-    if(empty($_POST['title']) || empty($_POST['content']) || empty($_FILES['image'])){
+    if(empty($_POST['title']) || empty($_POST['content']) || empty($_FILES['image']['name'])){
 
       if(empty($_POST['title'])){
         $titleError = "Title cannot be null";
@@ -30,7 +30,9 @@ if($_POST){
       }
 
     }else{
-      $file = 'images/'.($_FILES['image']['name']);
+      // $file = 'images/'.($_FILES['image']['name']);
+      $imageName = time() . '_' . $_FILES['image']['name']; 
+      $file = 'images/' . $imageName;
       $imageType = pathinfo($file,PATHINFO_EXTENSION);
 
       if($imageType != 'png' && $imageType != 'jpg' && $imageType != 'jpeg'){
@@ -39,13 +41,14 @@ if($_POST){
           
           $title = $_POST['title'];
           $content = $_POST['content'];
-          $image = $_FILES['image']['name'];
+          // $image = $_FILES['image']['name'];
+          $image = $imageName; // နာမည်အသစ်ကို သုံးမယ်
                                                           //path
           move_uploaded_file($_FILES['image']['tmp_name'],$file);
 
-          $stmt = $pdo->prepare("INSERT INTO posts(title,content,author_id,image) VALUES (:title,:content,:author_id,:image)");
+          $stmt = $pdo->prepare("INSERT INTO posts(title,content,image,author_id) VALUES (:title,:content,:image,:author_id)");
           $result = $stmt->execute(
-              array(':title'=>$title,':content'=>$content,':author_id'=>$_SESSION['user_id'],':image'=>$image)
+              array(':title'=>$title,':content'=>$content,':image'=>$image,':author_id'=>$_SESSION['user_id'])
           );
 
           if($result){

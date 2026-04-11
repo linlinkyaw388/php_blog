@@ -65,14 +65,15 @@ if(isset($_POST['search'])){
                 $stmt->execute();
                 $result = $stmt->fetchAll();
               }else{
-                $searchKey = $_POST['search'] ? $_POST['search'] : $_COOKIE['search'];
-                $stmt = $pdo->prepare("SELECT * FROM users WHERE title LIKE '%$searchKey%' ORDER BY id DESC");
+                // $searchKey = $_POST['search'] ? $_POST['search'] : $_COOKIE['search'];
+                $searchKey = !empty($_POST['search']) ? $_POST['search'] : (isset($_COOKIE['search']) ? $_COOKIE['search'] : '');
+                $stmt = $pdo->prepare("SELECT * FROM users WHERE name LIKE '%$searchKey%' ORDER BY id DESC");
                 // print_r($stmt);exit();
                 $stmt->execute();
                 $rawResult = $stmt->fetchAll();
                 $total_pages = ceil(count($rawResult) / $numOfrecs);
 
-                $stmt = $pdo->prepare("SELECT * FROM users ORDER BY id DESC LIMIT $offset,$numOfrecs");
+                $stmt = $pdo->prepare("SELECT * FROM users WHERE name LIKE '%$searchKey%' ORDER BY id DESC LIMIT $offset,$numOfrecs");
                 $stmt->execute();
                 $result = $stmt->fetchAll();
               }
@@ -101,21 +102,21 @@ if(isset($_POST['search'])){
 
                   if($result){
 
-                  $i = 1;
+                  $i = $offset +1;
                   foreach($result as $value){    ?>
 
                     <tr>
                       <td><?php echo $i; ?></td>
                       <td><?php echo escape($value['name']); ?></td>
                       <td><?php echo escape($value['email']); ?></td>
-                      <td><?php echo $value['role']; ?></td>
+                      <td><?php echo $value['role'] == 1 ? 'admin' : 'user'; ?></td>
                       <td>
                         <div class="btn-group">
                           <div>
                             <a href="user_edit.php?id=<?php echo $value['id'] ?>" type="button" class="btn btn-warning">Edit</a>
                           </div>
                           <div>
-                            <a href="delete.php?id=<?php echo $value['id'] ?>"
+                            <a href="user_delete.php?id=<?php echo $value['id'] ?>"
                              onclick="return confirm('Are you sure you want to delete this?')"
                              type="button" class="btn btn-danger">Delete</a>
                           </div>
