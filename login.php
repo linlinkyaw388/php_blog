@@ -21,11 +21,23 @@ if ($_POST) {
         if(password_verify($password,$user['password'])){
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['name'];
-            $_SESSION['role'] = 1;
+            // $_SESSION['role'] = 1;
+            $_SESSION['role'] = $user['role'];
             $_SESSION['logged_in'] = time();
+
+            if($_SESSION['role'] == 1){
+              header('Location: admin/index.php');
+              exit();
+            }elseif($_SESSION['role'] == 0){
+              header('Location: index.php');
+              exit();
+            }else{
+              header('Location: index.php');
+              exit();
+            }
             
-            header('Location: index.php');
-            exit();
+            // header('Location: index.php');
+            // exit();
         }
 
     }

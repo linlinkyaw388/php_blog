@@ -163,7 +163,7 @@ if ($_POST) {
 
                 <p><?php echo escape($result[0]['content'])?></p>
                 <h3>Comments</h3><hr>
-                <a href="/blog" type="button" class="btn btn-default">Go Back</a>
+                <a href="index.php" type="button" class="btn btn-default">Go Back</a>
               </div>
               <!-- /.card-body -->
               <div class="card-footer card-comments">
